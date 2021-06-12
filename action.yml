@@ -1,0 +1,28 @@
+name: 'DotCMS discover stable version'
+description: 'From a given DotCMS version discovers the stable Docker tags to '
+author: 'Victor Alfaro'
+inputs:
+  version:
+    description: 'DotCMS version usually founf in core/dotCMS/gradle.properties file'
+    required: false
+    default: 'true'
+  hash:
+    description: 'Build hash to use to create unique tag'
+    required: true
+  label:
+    description: 'Custom label for tag'
+    required: false
+  update_stable:
+    description: 'Flag that tells to update stable tags as well'
+    required: false
+    default: 'true'
+  base_tag_size:
+    description: 'Number of elements that conform a base stable version (e.g. 2 for "21.05" in 21.05.8)'
+    required: false
+    default: 2
+runs:
+  using: node12
+  main: dist/index.js
+branding:
+  icon: 'check'
+  color: 'blue'

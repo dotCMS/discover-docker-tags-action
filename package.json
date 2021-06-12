@@ -1,0 +1,47 @@
+{
+    "name": "@dotcms/commit-message-getter",
+    "version": "1.0.0",
+    "description": "Simple node program to discover, based on a DotCMS version, what stable docker tags should be updated",
+    "homepage": "https://github.com/dotCMS/discover-stable-versions-action#readme",
+    "bugs": {
+        "url": "https://github.com/dotCMS/discover-stable-versions-action/issues"
+    },
+    "license": "MIT",
+    "author": "Victor Alfaro <victor.alfaro@dotcms.com>",
+    "files": [
+        "action.yml",
+        "dist",
+        "lib"
+    ],
+    "main": "lib/main.js",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dotCMS/discover-stable-versions-action.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "format": "prettier --write **/*.ts",
+        "format-check": "prettier --check **/*.ts",
+        "lint": "eslint src/**/*.ts",
+        "pack": "ncc build",
+        "all": "npm run build && npm run format && npm run lint && npm run pack"
+    },
+    "dependencies": {
+        "@actions/core": "^1.2.6",
+        "@actions/github": "^4.0.0"
+    },
+    "devDependencies": {
+        "@tsconfig/node12": "^1.0.7",
+        "@types/node": "^12.19.6",
+        "@types/node-fetch": "^2.5.7",
+        "@typescript-eslint/parser": "^4.8.1",
+        "@vercel/ncc": "^0.26.1",
+        "eslint": "^7.0.0",
+        "eslint-plugin-github": "^4.1.1",
+        "eslint-plugin-jest": "^22.21.0",
+        "jest": "^27.0.4",
+        "js-yaml": "^3.14.0",
+        "prettier": "^1.19.1",
+        "typescript": "^3.9.7"
+    }
+}
