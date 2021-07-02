@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 
 const LTS_LABEL = 'lts'
-//const VERSION_REGEXP = /^\d{2}\.\d{2}((\.\d{1,2})*)(\w*)$/
+const VERSION_REGEXP = /^\d{2}\.\d{2}((\.\d{1,2})*)$/
 
 interface VersionProps {
   version: string
@@ -46,7 +46,7 @@ export function discoverTags(
   const uniqueTag = formatTag(versionProps.version, hash, versionProps.label)
 
   // Return just the unique tag when "update stable tags" flag is true
-  if (!updateStable /* || !VERSION_REGEXP.test(version)*/) {
+  if (!updateStable) {
     core.info(`Not updating stable tags, returning just [ ${uniqueTag} ]`)
     return [uniqueTag]
   }
@@ -83,6 +83,11 @@ export function discoverTags(
   // When label is balnk or 'lts' add the tag to result array
   if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
     discoveredTags.push(formatTag(versionSchema[0], ''))
+  }
+
+  // When version is comliant with release pattern YY.MM[.N] add 'latest'
+  if (VERSION_REGEXP.test(version)) {
+    discoveredTags.push(formatTag('latest', ''))
   }
 
   return discoveredTags
