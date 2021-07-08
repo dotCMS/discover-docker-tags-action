@@ -85,11 +85,6 @@ export function discoverTags(
     discoveredTags.push(formatTag(versionSchema[0], ''))
   }
 
-  // When version is comliant with release pattern YY.MM[.N] add 'latest'
-  if (VERSION_REGEXP.test(version)) {
-    discoveredTags.push(formatTag('latest', ''))
-  }
-
   return discoveredTags
 }
 
