@@ -12,9 +12,9 @@ function run() {
       core.getInput('hash'),
       core.getInput('label'),
       core.getInput('update_stable') === 'true',
+      core.getInput('also_latest') === 'true',
       parseInt(core.getInput('base_tag_Size'))
-    )
-    .join(' ')
+    ).join(' ')
 
   core.info(`Found these tags: [ ${tags} ]`)
   core.setOutput('discovered_tags', tags)

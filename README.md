@@ -10,8 +10,9 @@ Node based action to discover the tags to be used in an eventual Docker image pu
     version: 21.06.2
     hash: a2b3e56d
     label: lts
-    updateStable: true
+    update_stable: true
+    also_latest: true
 ```
 
 Should return something like
-`[ 21.06.2_lts_a2b3e56d 21.06.2_lts 21.06_lts 21.06 ]`
+`[ 21.06.2_lts_a2b3e56d 21.06.2_lts 21.06_lts 21.06 latest ]`

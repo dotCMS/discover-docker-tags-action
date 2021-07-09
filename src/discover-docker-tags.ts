@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 
 const LTS_LABEL = 'lts'
-const VERSION_REGEXP = /^\d{2}\.\d{2}((\.\d{1,2})*)$/
 
 interface VersionProps {
   version: string
@@ -16,6 +15,7 @@ interface VersionProps {
  * @param hash trucanted commit id used to define name for unique tag
  * @param label custom label used to define name for stable tags
  * @param updateStable flag for updating stable tags
+ * @param alsoLatest flag for updating "latest" tag
  * @param baseTagSize size of elements which conform a base stable tag (must likely to be 2)
  * @returns a string array of the discovered tags
  */
@@ -24,6 +24,7 @@ export function discoverTags(
   hash: string,
   label: string,
   updateStable: boolean,
+  alsoLatest: boolean,
   baseTagSize: number
 ): string[] {
   // Validations for paramameters
@@ -80,13 +81,14 @@ export function discoverTags(
   if (versionProps.label === LTS_LABEL) {
     discoveredTags.push(formatTag(versionSchema[0], '', LTS_LABEL))
   }
+
   // When label is balnk or 'lts' add the tag to result array
   if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
     discoveredTags.push(formatTag(versionSchema[0], ''))
   }
 
-  // When version is comliant with release pattern YY.MM[.N] add 'latest'
-  if (VERSION_REGEXP.test(version)) {
+  // When updateStable and alsoLatest flags are true then add 'latest' tag
+  if (updateStable && alsoLatest) {
     discoveredTags.push(formatTag('latest', ''))
   }
 
@@ -125,9 +127,9 @@ function normalizeVersion(version: string, label?: string): VersionProps {
   }
 
   const schema = version.split('_')
-  const poped = schema.pop()
+  const popped = schema.pop()
   return {
     version: schema.join(),
-    label: poped
+    label: popped
   }
 }
