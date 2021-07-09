@@ -27,6 +27,7 @@ export function discoverTags(
   alsoLatest: boolean,
   baseTagSize: number
 ): string[] {
+  core.info(`Params: ${version}, ${hash}, ${label}, ${updateStable}, ${alsoLatest}, ${baseTagSize}`)
   // Validations for paramameters
   if (version === '') {
     core.error('Provided version is empty, not returning any tags')
