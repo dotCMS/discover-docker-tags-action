@@ -38,10 +38,11 @@ const LTS_LABEL = 'lts';
  * @param hash trucanted commit id used to define name for unique tag
  * @param label custom label used to define name for stable tags
  * @param updateStable flag for updating stable tags
+ * @param alsoLatest flag for updating "latest" tag
  * @param baseTagSize size of elements which conform a base stable tag (must likely to be 2)
  * @returns a string array of the discovered tags
  */
-function discoverTags(version, hash, label, updateStable, baseTagSize) {
+function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSize) {
     // Validations for paramameters
     if (version === '') {
         core.error('Provided version is empty, not returning any tags');
@@ -58,7 +59,7 @@ function discoverTags(version, hash, label, updateStable, baseTagSize) {
     // Define unique tag with version, hash and label
     const uniqueTag = formatTag(versionProps.version, hash, versionProps.label);
     // Return just the unique tag when "update stable tags" flag is true
-    if (!updateStable /* || !VERSION_REGEXP.test(version)*/) {
+    if (!updateStable) {
         core.info(`Not updating stable tags, returning just [ ${uniqueTag} ]`);
         return [uniqueTag];
     }
@@ -89,6 +90,10 @@ function discoverTags(version, hash, label, updateStable, baseTagSize) {
     // When label is balnk or 'lts' add the tag to result array
     if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
         discoveredTags.push(formatTag(versionSchema[0], ''));
+    }
+    // When updateStable and alsoLatest flags are true then add 'latest' tag
+    if (updateStable && alsoLatest) {
+        discoveredTags.push(formatTag('latest', ''));
     }
     return discoveredTags;
 }
@@ -123,10 +128,10 @@ function normalizeVersion(version, label) {
         };
     }
     const schema = version.split('_');
-    const poped = schema.pop();
+    const popped = schema.pop();
     return {
         version: schema.join(),
-        label: poped
+        label: popped
     };
 }
 
@@ -165,7 +170,7 @@ const discoverer = __importStar(__nccwpck_require__(886));
 function run() {
     // Call module logic to discover tags
     const tags = discoverer
-        .discoverTags(core.getInput('version'), core.getInput('hash'), core.getInput('label'), core.getInput('update_stable') === 'true', parseInt(core.getInput('base_tag_Size')))
+        .discoverTags(core.getInput('version'), core.getInput('hash'), core.getInput('label'), core.getInput('update_stable') === 'true', core.getInput('also_latest') === 'true', parseInt(core.getInput('base_tag_Size')))
         .join(' ');
     core.info(`Found these tags: [ ${tags} ]`);
     core.setOutput('discovered_tags', tags);

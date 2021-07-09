@@ -16,6 +16,10 @@ inputs:
     description: 'Flag that tells to update stable tags as well'
     required: false
     default: 'true'
+  also_latest:
+    description: 'Flag that tells to also update "latest" tag (depends on update_stable input to be set to true)'
+    required: false
+    default: 'false'
   base_tag_size:
     description: 'Number of elements that conform a base stable version (e.g. 2 for "21.05" in 21.05.8)'
     required: false
