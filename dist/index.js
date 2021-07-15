@@ -68,7 +68,7 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     }
     // Return just the unique tag when "update stable tags" flag is true
     if (!updateStable) {
-        core.info(`Not updating stable tags, returning just [ ${discoveredTags.join(' ')} ]`);
+        core.info('Not updating stable tags]');
         return discoveredTags;
     }
     // Split the version elements

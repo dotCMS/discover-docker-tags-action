@@ -56,9 +56,7 @@ export function discoverTags(
 
   // Return just the unique tag when "update stable tags" flag is true
   if (!updateStable) {
-    core.info(
-      `Not updating stable tags, returning just [ ${discoveredTags.join(' ')} ]`
-    )
+    core.info('Not updating stable tags]')
     return discoveredTags
   }
 
