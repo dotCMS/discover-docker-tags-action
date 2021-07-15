@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 
 const LTS_LABEL = 'lts'
+const CANARY_LABEL = 'canary'
 
 interface VersionProps {
   version: string
@@ -42,14 +43,21 @@ export function discoverTags(
 
   // Normalize version
   const versionProps = normalizeVersion(version, label)
+  // Define result array
+  const discoveredTags = []
+  // Define unique tag with version, hash and label and push it
+  discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label))
 
-  // Define unique tag with version, hash and label
-  const uniqueTag = formatTag(versionProps.version, hash, versionProps.label)
+  // When canary label detected add it to discovered tags with no hash as well
+  if (versionProps.label === CANARY_LABEL) {
+    // Push tag without the hash in case label is 'canary'
+    discoveredTags.push(formatTag(versionProps.version, '', versionProps.label))
+  }
 
   // Return just the unique tag when "update stable tags" flag is true
   if (!updateStable) {
-    core.info(`Not updating stable tags, returning just [ ${uniqueTag} ]`)
-    return [uniqueTag]
+    core.info(`Not updating stable tags, returning just [ ${discoveredTags.join(' ')} ]`)
+    return discoveredTags
   }
 
   // Split the version elements
@@ -58,12 +66,7 @@ export function discoverTags(
   const baseTag = versionSchema.splice(0, baseTagSize).join('.')
   // Put back the base version as the first element (e.g.[ '21.06' '2' ])
   versionSchema.unshift(baseTag)
-
   core.info(`Version array: ${versionSchema.join(' ')}`)
-  // Define result array
-  const discoveredTags = []
-  // Push uniquye tag
-  discoveredTags.push(uniqueTag)
 
   // Loop over the version array until one element (base version) is left
   while (versionSchema.length > 1) {
@@ -111,7 +114,7 @@ function formatTag(version: string, hash: string, label?: string): string {
 }
 
 /**
- * Normalizes the version in case a label is not provided an the version ends with the suffix '_lts'.
+ * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
  * Then that part of the version becomes the label.
  *
  * @param version provided version
@@ -119,7 +122,7 @@ function formatTag(version: string, hash: string, label?: string): string {
  * @returns a VersionProps object holding the normalized version and label
  */
 function normalizeVersion(version: string, label?: string): VersionProps {
-  if (!version.endsWith(`_${LTS_LABEL}`)) {
+  if (!(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${CANARY_LABEL}`))) {
     return {
       version,
       label
