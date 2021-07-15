@@ -30,6 +30,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.discoverTags = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const LTS_LABEL = 'lts';
+const CANARY_LABEL = 'canary';
 /**
  * Based on a provided version discover the stable tag versions it needs
  * to update when publishing the Docker image.
@@ -56,12 +57,19 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     label = label === null || label === void 0 ? void 0 : label.toLowerCase();
     // Normalize version
     const versionProps = normalizeVersion(version, label);
-    // Define unique tag with version, hash and label
-    const uniqueTag = formatTag(versionProps.version, hash, versionProps.label);
+    // Define result array
+    const discoveredTags = [];
+    // Define unique tag with version, hash and label and push it
+    discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label));
+    // When canary label detected add it to discovered tags with no hash as well
+    if (versionProps.label === CANARY_LABEL) {
+        // Push tag without the hash in case label is 'canary'
+        discoveredTags.push(formatTag(versionProps.version, '', versionProps.label));
+    }
     // Return just the unique tag when "update stable tags" flag is true
     if (!updateStable) {
-        core.info(`Not updating stable tags, returning just [ ${uniqueTag} ]`);
-        return [uniqueTag];
+        core.info('Not updating stable tags]');
+        return discoveredTags;
     }
     // Split the version elements
     const versionSchema = versionProps.version.split('.');
@@ -70,10 +78,6 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     // Put back the base version as the first element (e.g.[ '21.06' '2' ])
     versionSchema.unshift(baseTag);
     core.info(`Version array: ${versionSchema.join(' ')}`);
-    // Define result array
-    const discoveredTags = [];
-    // Push uniquye tag
-    discoveredTags.push(uniqueTag);
     // Loop over the version array until one element (base version) is left
     while (versionSchema.length > 1) {
         // If label is blank or 'lts' then add a tag to result array
@@ -113,7 +117,7 @@ function formatTag(version, hash, label) {
     return `${version}${labelValue}${hashValue}`;
 }
 /**
- * Normalizes the version in case a label is not provided an the version ends with the suffix '_lts'.
+ * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
  * Then that part of the version becomes the label.
  *
  * @param version provided version
@@ -121,7 +125,7 @@ function formatTag(version, hash, label) {
  * @returns a VersionProps object holding the normalized version and label
  */
 function normalizeVersion(version, label) {
-    if (!version.endsWith(`_${LTS_LABEL}`)) {
+    if (!(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${CANARY_LABEL}`))) {
         return {
             version,
             label
