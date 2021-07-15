@@ -56,7 +56,9 @@ export function discoverTags(
 
   // Return just the unique tag when "update stable tags" flag is true
   if (!updateStable) {
-    core.info(`Not updating stable tags, returning just [ ${discoveredTags.join(' ')} ]`)
+    core.info(
+      `Not updating stable tags, returning just [ ${discoveredTags.join(' ')} ]`
+    )
     return discoveredTags
   }
 
@@ -122,7 +124,9 @@ function formatTag(version: string, hash: string, label?: string): string {
  * @returns a VersionProps object holding the normalized version and label
  */
 function normalizeVersion(version: string, label?: string): VersionProps {
-  if (!(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${CANARY_LABEL}`))) {
+  if (
+    !(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${CANARY_LABEL}`))
+  ) {
     return {
       version,
       label
