@@ -15,7 +15,7 @@ interface VersionProps {
  * @param version provided version (e.g. 21.07)
  * @param hash trucanted commit id used to define name for unique tag
  * @param label custom label used to define name for stable tags
- * @param updateStable flag for updating stable tags
+ * @param updateStable value for updating stable tags
  * @param alsoLatest flag for updating "latest" tag
  * @param baseTagSize size of elements which conform a base stable tag (must likely to be 2)
  * @returns a string array of the discovered tags
@@ -24,7 +24,7 @@ export function discoverTags(
   version: string,
   hash: string,
   label: string,
-  updateStable: boolean,
+  updateStable: string,
   alsoLatest: boolean,
   baseTagSize: number
 ): string[] {
@@ -47,6 +47,9 @@ export function discoverTags(
   const discoveredTags = []
   // Define unique tag with version, hash and label and push it
   discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label))
+  if (updateStable === 'single') {
+    discoveredTags.push(formatTag(versionProps.version, '', versionProps.label))
+  }
 
   // When canary label detected add it to discovered tags with no hash as well
   if (versionProps.label === CANARY_LABEL) {
@@ -55,7 +58,7 @@ export function discoverTags(
   }
 
   // Return just the unique tag when "update stable tags" flag is true
-  if (!updateStable) {
+  if (updateStable !== 'true') {
     core.info('Not updating stable tags]')
     return discoveredTags
   }
@@ -91,7 +94,7 @@ export function discoverTags(
   }
 
   // When updateStable and alsoLatest flags are true then add 'latest' tag
-  if (updateStable && alsoLatest) {
+  if (updateStable === 'true' && alsoLatest) {
     discoveredTags.push(formatTag('latest', ''))
   }
 

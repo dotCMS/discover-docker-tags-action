@@ -13,7 +13,7 @@ inputs:
     description: 'Custom label for tag'
     required: false
   update_stable:
-    description: 'Flag that tells to update stable tags as well'
+    description: 'Value that tells to update stable tags as well, possible values: true, false or single'
     required: false
     default: 'true'
   also_latest:

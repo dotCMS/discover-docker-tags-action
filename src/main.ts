@@ -11,7 +11,7 @@ function run() {
       core.getInput('version'),
       core.getInput('hash'),
       core.getInput('label'),
-      core.getInput('update_stable') === 'true',
+      core.getInput('update_stable'),
       core.getInput('also_latest') === 'true',
       parseInt(core.getInput('base_tag_Size'))
     )
