@@ -10,7 +10,7 @@ inputs:
     description: 'Build hash to use to create unique tag'
     required: true
   label:
-    description: 'Custom label for tag'
+    description: 'Custom label for tag. Could be anything but values: "SNAPSHOT" and "lts" are special cases'
     required: false
   update_stable:
     description: 'Value that tells to update stable tags as well, possible values: true, false or single'

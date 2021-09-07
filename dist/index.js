@@ -30,7 +30,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.discoverTags = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const LTS_LABEL = 'lts';
-const CANARY_LABEL = 'canary';
+const SNAPSHOT_LABEL = 'SNAPSHOT';
 /**
  * Based on a provided version discover the stable tag versions it needs
  * to update when publishing the Docker image.
@@ -53,25 +53,25 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
         core.error('Provided hash is empty, not returning any tags');
         return [];
     }
-    // Make sure label is in lowercase
-    label = label === null || label === void 0 ? void 0 : label.toLowerCase();
     // Normalize version
     const versionProps = normalizeVersion(version, label);
+    // Determine if this is a SNAPSHOT tag
+    const isSnapshot = versionProps.label === SNAPSHOT_LABEL;
     // Define result array
     const discoveredTags = [];
     // Define unique tag with version, hash and label and push it
     discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label));
-    if (updateStable === 'single') {
+    if (updateStable === 'single' && !isSnapshot) {
         discoveredTags.push(formatTag(versionProps.version, '', versionProps.label));
     }
-    // When canary label detected add it to discovered tags with no hash as well
-    if (versionProps.label === CANARY_LABEL) {
-        // Push tag without the hash in case label is 'canary'
-        discoveredTags.push(formatTag(versionProps.version, '', versionProps.label));
+    // When SNAPSHOT label detected add it to discovered tags with no hash as well
+    if (isSnapshot) {
+        // Push tag without the hash in case label is 'SNAPSHOT'
+        discoveredTags.push(formatTag(versionProps.version, '', SNAPSHOT_LABEL));
     }
     // Return just the unique tag when "update stable tags" flag is true
-    if (updateStable !== 'true') {
-        core.info('Not updating stable tags]');
+    if (updateStable !== 'true' || isSnapshot) {
+        core.info('Not updating stable tags');
         return discoveredTags;
     }
     // Split the version elements
@@ -94,7 +94,7 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     if (versionProps.label === LTS_LABEL) {
         discoveredTags.push(formatTag(versionSchema[0], '', LTS_LABEL));
     }
-    // When label is balnk or 'lts' add the tag to result array
+    // When label is blank or 'lts' add the tag to result array
     if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
         discoveredTags.push(formatTag(versionSchema[0], ''));
     }
@@ -128,10 +128,13 @@ function formatTag(version, hash, label) {
  * @returns a VersionProps object holding the normalized version and label
  */
 function normalizeVersion(version, label) {
-    if (!(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${CANARY_LABEL}`))) {
+    // Make sure label is in lowercase
+    const lowered = label === null || label === void 0 ? void 0 : label.toLowerCase();
+    const definitive = lowered === SNAPSHOT_LABEL.toLowerCase() ? SNAPSHOT_LABEL : lowered;
+    if (!(version.endsWith(`_${LTS_LABEL}`) || version.endsWith(`_${SNAPSHOT_LABEL}`))) {
         return {
             version,
-            label
+            label: definitive
         };
     }
     const schema = version.split('_');
