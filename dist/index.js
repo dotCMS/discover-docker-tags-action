@@ -61,7 +61,7 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     const discoveredTags = [];
     // Define unique tag with version, hash and label and push it
     discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label));
-    // When single specified, then just add another single tag 
+    // When single specified, then just add another single tag
     if (updateStable === 'single' && !isSnapshot) {
         discoveredTags.push(formatTag(versionProps.version, '', versionProps.label));
     }
@@ -118,7 +118,9 @@ exports.discoverTags = discoverTags;
 function formatTag(version, hash, label) {
     const hashValue = hash !== '' ? `_${hash}` : '';
     const labelValue = label ? `_${label}` : '';
-    return version === SNAPSHOT_LABEL ? `${version}${hashValue}${labelValue}` : `${version}${labelValue}${hashValue}`;
+    return label === SNAPSHOT_LABEL
+        ? `${version}${hashValue}${labelValue}`
+        : `${version}${labelValue}${hashValue}`;
 }
 /**
  * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
