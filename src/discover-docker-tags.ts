@@ -47,6 +47,8 @@ export function discoverTags(
   const discoveredTags = []
   // Define unique tag with version, hash and label and push it
   discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label))
+
+  // When single specified, then just add another single tag
   if (updateStable === 'single' && !isSnapshot) {
     discoveredTags.push(formatTag(versionProps.version, '', versionProps.label))
   }
@@ -113,7 +115,9 @@ export function discoverTags(
 function formatTag(version: string, hash: string, label?: string): string {
   const hashValue = hash !== '' ? `_${hash}` : ''
   const labelValue = label ? `_${label}` : ''
-  return `${version}${labelValue}${hashValue}`
+  return version === SNAPSHOT_LABEL
+    ? `${version}${hashValue}${labelValue}`
+    : `${version}${labelValue}${hashValue}`
 }
 
 /**
