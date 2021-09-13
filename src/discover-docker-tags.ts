@@ -115,9 +115,7 @@ export function discoverTags(
 function formatTag(version: string, hash: string, label?: string): string {
   const hashValue = hash !== '' ? `_${hash}` : ''
   const labelValue = label ? `_${label}` : ''
-  return label === SNAPSHOT_LABEL
-    ? `${version}${hashValue}${labelValue}`
-    : `${version}${labelValue}${hashValue}`
+  return `${version}${labelValue}${hashValue}`
 }
 
 /**
