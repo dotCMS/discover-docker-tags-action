@@ -118,9 +118,7 @@ exports.discoverTags = discoverTags;
 function formatTag(version, hash, label) {
     const hashValue = hash !== '' ? `_${hash}` : '';
     const labelValue = label ? `_${label}` : '';
-    return label === SNAPSHOT_LABEL
-        ? `${version}${hashValue}${labelValue}`
-        : `${version}${labelValue}${hashValue}`;
+    return `${version}${labelValue}${hashValue}`;
 }
 /**
  * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
