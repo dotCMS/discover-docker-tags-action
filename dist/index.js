@@ -119,8 +119,8 @@ function formatTag(version, hash, label) {
     const hashValue = hash !== '' ? `_${hash}` : '';
     const labelValue = label ? `_${label}` : '';
     return label === SNAPSHOT_LABEL
-        ? `${version}${hashValue}${labelValue}`
-        : `${version}${labelValue}${hashValue}`;
+        ? `\`${version}${hashValue}${labelValue}\``
+        : `\`${version}${labelValue}${hashValue}\``;
 }
 /**
  * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
@@ -185,7 +185,7 @@ function run() {
     // Call module logic to discover tags
     const tags = discoverer
         .discoverTags(core.getInput('version'), core.getInput('hash'), core.getInput('label'), core.getInput('update_stable'), core.getInput('also_latest') === 'true', parseInt(core.getInput('base_tag_Size')))
-        .join(' ');
+        .join(', ');
     core.info(`Found these tags: [ ${tags} ]`);
     core.setOutput('discovered_tags', tags);
 }
