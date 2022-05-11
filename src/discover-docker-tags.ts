@@ -73,10 +73,13 @@ export function discoverTags(
   versionSchema.unshift(baseTag)
   core.info(`Version array: ${versionSchema.join(' ')}`)
 
+  const labelIsLts = versionProps.label === LTS_LABEL
+  const labelIsBlank = versionProps.label === ''
+
   // Loop over the version array until one element (base version) is left
   while (versionSchema.length > 1) {
     // If label is blank or 'lts' then add a tag to result array
-    if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
+    if (labelIsBlank || labelIsLts) {
       discoveredTags.push(
         formatTag(versionSchema.join('.'), '', versionProps.label)
       )
@@ -86,12 +89,12 @@ export function discoverTags(
   }
 
   // When label is 'lts' add the tag to result array
-  if (versionProps.label === LTS_LABEL) {
-    discoveredTags.push(formatTag(versionSchema[0], '', LTS_LABEL))
-  }
+  // if (isLts) {
+  //   discoveredTags.push(formatTag(versionSchema[0], '', LTS_LABEL))
+  // }
 
   // When label is blank or 'lts' add the tag to result array
-  if (versionProps.label === '' || versionProps.label === LTS_LABEL) {
+  if (labelIsBlank) {
     discoveredTags.push(formatTag(versionSchema[0], ''))
   }
 
