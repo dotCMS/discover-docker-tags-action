@@ -24,8 +24,12 @@ inputs:
     description: 'Number of elements that conform a base stable version (e.g. 2 for "21.05" in 21.05.8)'
     required: false
     default: 2
+  image_name:
+    description: 'Image name to include with tag, empty is not provided'
+    required: false
+    default: ''
 runs:
-  using: node12
+  using: node16
   main: dist/index.js
 branding:
   icon: 'check'

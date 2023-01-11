@@ -18,6 +18,7 @@ interface VersionProps {
  * @param updateStable value for updating stable tags
  * @param alsoLatest flag for updating "latest" tag
  * @param baseTagSize size of elements which conform a base stable tag (must likely to be 2)
+ * @param imageName image name to be included, when present is included as a prefix in the result tags
  * @returns a string array of the discovered tags
  */
 export function discoverTags(
@@ -26,7 +27,8 @@ export function discoverTags(
   label: string,
   updateStable: string,
   alsoLatest: boolean,
-  baseTagSize: number
+  baseTagSize: number,
+  imageName: string
 ): string[] {
   // Validations for paramameters
   if (version === '') {
@@ -46,17 +48,23 @@ export function discoverTags(
   // Define result array
   const discoveredTags = []
   // Define unique tag with version, hash and label and push it
-  discoveredTags.push(formatTag(versionProps.version, hash, versionProps.label))
+  discoveredTags.push(
+    formatTag(versionProps.version, hash, imageName, versionProps.label)
+  )
 
   // When single specified, then just add another single tag
   if (updateStable === 'single' && !isSnapshot) {
-    discoveredTags.push(formatTag(versionProps.version, '', versionProps.label))
+    discoveredTags.push(
+      formatTag(versionProps.version, '', imageName, versionProps.label)
+    )
   }
 
   // When SNAPSHOT label detected add it to discovered tags with no hash as well
   if (isSnapshot) {
     // Push tag without the hash in case label is 'SNAPSHOT'
-    discoveredTags.push(formatTag(versionProps.version, '', SNAPSHOT_LABEL))
+    discoveredTags.push(
+      formatTag(versionProps.version, '', imageName, SNAPSHOT_LABEL)
+    )
   }
 
   // Return just the unique tag when "update stable tags" flag is true
@@ -81,7 +89,7 @@ export function discoverTags(
     // If label is blank or 'lts' then add a tag to result array
     if (labelIsBlank || labelIsLts) {
       discoveredTags.push(
-        formatTag(versionSchema.join('.'), '', versionProps.label)
+        formatTag(versionSchema.join('.'), '', imageName, versionProps.label)
       )
     }
     // Remove last array element
@@ -95,12 +103,12 @@ export function discoverTags(
 
   // When label is blank or 'lts' add the tag to result array
   if (labelIsBlank) {
-    discoveredTags.push(formatTag(versionSchema[0], ''))
+    discoveredTags.push(formatTag(versionSchema[0], '', imageName))
   }
 
   // When updateStable and alsoLatest flags are true then add 'latest' tag
   if (updateStable === 'true' && alsoLatest) {
-    discoveredTags.push(formatTag('latest', ''))
+    discoveredTags.push(formatTag('latest', '', imageName))
   }
 
   return discoveredTags
@@ -112,15 +120,23 @@ export function discoverTags(
  *
  * @param version version
  * @param hash hash to be included with a '_' prefix
+ * @param imageName image name
  * @param label optional label added with a '_' prefix
  * @returns a decotared version.
  */
-function formatTag(version: string, hash: string, label?: string): string {
+function formatTag(
+  version: string,
+  hash: string,
+  imageName: string,
+  label?: string
+): string {
   const hashValue = hash !== '' ? `_${hash}` : ''
   const labelValue = label ? `_${label}` : ''
-  return label === SNAPSHOT_LABEL
-    ? `\`${version}${hashValue}${labelValue}\``
-    : `\`${version}${labelValue}${hashValue}\``
+  const tag =
+    label === SNAPSHOT_LABEL
+      ? `${version}${hashValue}${labelValue}`
+      : `${version}${labelValue}${hashValue}`
+  return imageName ? `${imageName}:${tag}` : tag
 }
 
 /**

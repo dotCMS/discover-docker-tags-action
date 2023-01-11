@@ -13,7 +13,8 @@ function run() {
       core.getInput('label'),
       core.getInput('update_stable'),
       core.getInput('also_latest') === 'true',
-      parseInt(core.getInput('base_tag_Size'))
+      parseInt(core.getInput('base_tag_size')),
+      core.getInput('image_name')
     )
     .join(', ')
 
