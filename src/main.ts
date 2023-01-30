@@ -16,7 +16,7 @@ function run() {
       parseInt(core.getInput('base_tag_size')),
       core.getInput('image_name')
     )
-    .join(', ')
+    .join(',')
 
   core.info(`Found these tags: [ ${tags} ]`)
   core.setOutput('discovered_tags', tags)

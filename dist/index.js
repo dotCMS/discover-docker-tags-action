@@ -198,7 +198,7 @@ function run() {
     // Call module logic to discover tags
     const tags = discoverer
         .discoverTags(core.getInput('version'), core.getInput('hash'), core.getInput('label'), core.getInput('update_stable'), core.getInput('also_latest') === 'true', parseInt(core.getInput('base_tag_size')), core.getInput('image_name'))
-        .join(', ');
+        .join(',');
     core.info(`Found these tags: [ ${tags} ]`);
     core.setOutput('discovered_tags', tags);
 }
