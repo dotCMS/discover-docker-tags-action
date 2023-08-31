@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 
 const LTS_LABEL = 'lts'
 const SNAPSHOT_LABEL = 'SNAPSHOT'
+const PRE_RELEASE_LABEL = 'pre-release'
 
 interface VersionProps {
   version: string
@@ -44,6 +45,7 @@ export function discoverTags(
   const versionProps = normalizeVersion(version, label)
   // Determine if this is a SNAPSHOT tag
   const isSnapshot = versionProps.label === SNAPSHOT_LABEL
+  const isPreRelease = versionProps.label === PRE_RELEASE_LABEL
 
   // Define result array
   const discoveredTags = []
@@ -53,7 +55,7 @@ export function discoverTags(
   )
 
   // When single specified, then just add another single tag
-  if (updateStable === 'single' && !isSnapshot) {
+  if (updateStable === 'single' && !isSnapshot && !isPreRelease) {
     discoveredTags.push(
       formatTag(versionProps.version, '', imageName, versionProps.label)
     )
@@ -65,6 +67,11 @@ export function discoverTags(
     discoveredTags.push(
       formatTag(versionProps.version, '', imageName, SNAPSHOT_LABEL)
     )
+  }
+
+  // When pre-release label detected add it to discovered tags with no hash as well
+  if (isPreRelease) {
+    discoveredTags.push(formatTag('', hash, imageName, PRE_RELEASE_LABEL))
   }
 
   // Return just the unique tag when "update stable tags" flag is true

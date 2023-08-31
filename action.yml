@@ -3,7 +3,7 @@ description: 'From a given DotCMS version discovers the stable Docker tags to '
 author: 'Victor Alfaro'
 inputs:
   version:
-    description: 'DotCMS version usually founf in core/dotCMS/gradle.properties file'
+    description: 'DotCMS version usually found in core/dotCMS/gradle.properties file'
     required: false
     default: 'true'
   hash:
@@ -23,7 +23,7 @@ inputs:
   base_tag_size:
     description: 'Number of elements that conform a base stable version (e.g. 2 for "21.05" in 21.05.8)'
     required: false
-    default: 2
+    default: '3'
   image_name:
     description: 'Image name to include with tag, empty is not provided'
     required: false

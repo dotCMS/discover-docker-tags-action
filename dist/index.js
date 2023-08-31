@@ -34,6 +34,7 @@ exports.discoverTags = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const LTS_LABEL = 'lts';
 const SNAPSHOT_LABEL = 'SNAPSHOT';
+const PRE_RELEASE_LABEL = 'pre-release';
 /**
  * Based on a provided version discover the stable tag versions it needs
  * to update when publishing the Docker image.
@@ -61,18 +62,23 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     const versionProps = normalizeVersion(version, label);
     // Determine if this is a SNAPSHOT tag
     const isSnapshot = versionProps.label === SNAPSHOT_LABEL;
+    const isPreRelease = versionProps.label === PRE_RELEASE_LABEL;
     // Define result array
     const discoveredTags = [];
     // Define unique tag with version, hash and label and push it
     discoveredTags.push(formatTag(versionProps.version, hash, imageName, versionProps.label));
     // When single specified, then just add another single tag
-    if (updateStable === 'single' && !isSnapshot) {
+    if (updateStable === 'single' && !isSnapshot && !isPreRelease) {
         discoveredTags.push(formatTag(versionProps.version, '', imageName, versionProps.label));
     }
     // When SNAPSHOT label detected add it to discovered tags with no hash as well
     if (isSnapshot) {
         // Push tag without the hash in case label is 'SNAPSHOT'
         discoveredTags.push(formatTag(versionProps.version, '', imageName, SNAPSHOT_LABEL));
+    }
+    // When pre-release label detected add it to discovered tags with no hash as well
+    if (isPreRelease) {
+        discoveredTags.push(formatTag('', hash, imageName, PRE_RELEASE_LABEL));
     }
     // Return just the unique tag when "update stable tags" flag is true
     if (updateStable !== 'true' || isSnapshot) {
