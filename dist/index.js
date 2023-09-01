@@ -66,7 +66,9 @@ function discoverTags(version, hash, label, updateStable, alsoLatest, baseTagSiz
     // Define result array
     const discoveredTags = [];
     // Define unique tag with version, hash and label and push it
-    discoveredTags.push(formatTag(versionProps.version, hash, imageName, versionProps.label));
+    if (!isPreRelease) {
+        discoveredTags.push(formatTag(versionProps.version, hash, imageName, versionProps.label));
+    }
     // When single specified, then just add another single tag
     if (updateStable === 'single' && !isSnapshot && !isPreRelease) {
         discoveredTags.push(formatTag(versionProps.version, '', imageName, versionProps.label));
