@@ -137,13 +137,26 @@ function formatTag(
   imageName: string,
   label?: string
 ): string {
-  const hashValue = hash !== '' ? `_${hash}` : ''
-  const labelValue = label ? `_${label}` : ''
-  const tag =
-    label === SNAPSHOT_LABEL
-      ? `${version}${hashValue}${labelValue}`
-      : `${version}${labelValue}${hashValue}`
+  const tagChunks: string[] = []
+
+  addChunk(tagChunks, version)
+  if (label === SNAPSHOT_LABEL) {
+    addChunk(tagChunks, hash)
+    addChunk(tagChunks, label)
+  } else {
+    addChunk(tagChunks, label)
+    addChunk(tagChunks, hash)
+  }
+
+  const tag = tagChunks.join('_')
   return imageName ? `${imageName}:${tag}` : tag
+}
+
+function addChunk(chunks: string[], chunk?: string) {
+  if (!chunk || chunk.trim() === '') {
+    return
+  }
+  chunks.push(chunk)
 }
 
 /**

@@ -129,12 +129,24 @@ exports.discoverTags = discoverTags;
  * @returns a decotared version.
  */
 function formatTag(version, hash, imageName, label) {
-    const hashValue = hash !== '' ? `_${hash}` : '';
-    const labelValue = label ? `_${label}` : '';
-    const tag = label === SNAPSHOT_LABEL
-        ? `${version}${hashValue}${labelValue}`
-        : `${version}${labelValue}${hashValue}`;
+    const tagChunks = [];
+    addChunk(tagChunks, version);
+    if (label === SNAPSHOT_LABEL) {
+        addChunk(tagChunks, hash);
+        addChunk(tagChunks, label);
+    }
+    else {
+        addChunk(tagChunks, label);
+        addChunk(tagChunks, hash);
+    }
+    const tag = tagChunks.join('_');
     return imageName ? `${imageName}:${tag}` : tag;
+}
+function addChunk(chunks, chunk) {
+    if (!chunk || chunk.trim() === '') {
+        return;
+    }
+    chunks.push(chunk);
 }
 /**
  * Normalizes the version in case a label is not provided and the version ends with the suffix '_lts' or '_canary'.
@@ -737,8 +749,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(404);
-const auth_1 = __nccwpck_require__(758);
+const http_client_1 = __nccwpck_require__(255);
+const auth_1 = __nccwpck_require__(526);
 const core_1 = __nccwpck_require__(186);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
@@ -1207,7 +1219,7 @@ exports.toCommandProperties = toCommandProperties;
 
 /***/ }),
 
-/***/ 758:
+/***/ 526:
 /***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
@@ -1295,7 +1307,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 
 /***/ }),
 
-/***/ 404:
+/***/ 255:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1333,7 +1345,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
 const http = __importStar(__nccwpck_require__(685));
 const https = __importStar(__nccwpck_require__(687));
-const pm = __importStar(__nccwpck_require__(843));
+const pm = __importStar(__nccwpck_require__(835));
 const tunnel = __importStar(__nccwpck_require__(294));
 var HttpCodes;
 (function (HttpCodes) {
@@ -1420,6 +1432,19 @@ class HttpClientResponse {
                 });
                 this.message.on('end', () => {
                     resolve(output.toString());
+                });
+            }));
+        });
+    }
+    readBodyBuffer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
+                const chunks = [];
+                this.message.on('data', (chunk) => {
+                    chunks.push(chunk);
+                });
+                this.message.on('end', () => {
+                    resolve(Buffer.concat(chunks));
                 });
             }));
         });
@@ -1907,7 +1932,7 @@ const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCa
 
 /***/ }),
 
-/***/ 843:
+/***/ 835:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1928,7 +1953,13 @@ function getProxyUrl(reqUrl) {
         }
     })();
     if (proxyVar) {
-        return new URL(proxyVar);
+        try {
+            return new URL(proxyVar);
+        }
+        catch (_a) {
+            if (!proxyVar.startsWith('http://') && !proxyVar.startsWith('https://'))
+                return new URL(`http://${proxyVar}`);
+        }
     }
     else {
         return undefined;
@@ -1938,6 +1969,10 @@ exports.getProxyUrl = getProxyUrl;
 function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
+    }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
     }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
@@ -1964,13 +1999,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
@@ -1990,7 +2036,7 @@ module.exports = __nccwpck_require__(219);
 
 
 var net = __nccwpck_require__(808);
-var tls = __nccwpck_require__(821);
+var tls = __nccwpck_require__(404);
 var http = __nccwpck_require__(685);
 var https = __nccwpck_require__(687);
 var events = __nccwpck_require__(361);
@@ -2973,7 +3019,7 @@ module.exports = require("path");
 
 /***/ }),
 
-/***/ 821:
+/***/ 404:
 /***/ ((module) => {
 
 "use strict";
