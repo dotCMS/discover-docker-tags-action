@@ -28,6 +28,12 @@ inputs:
     description: 'Image name to include with tag, empty is not provided'
     required: false
     default: ''
+outputs:
+  discovered_tags:
+    description: 'Discovered tags'
+  formatted_tags:
+    description: 'Formatted tags'
+
 runs:
   using: node16
   main: dist/index.js
